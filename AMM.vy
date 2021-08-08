@@ -23,8 +23,10 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
 	#Your code here
 	self.tokenA = ERC20(tokenA_addr)
 	self.tokenB = ERC20(tokenB_addr)
-	self.tokenA.transferFrom(msg.sender, self, tokenA_quantity)
-	self.tokenB.transferFrom(msg.sender, self, tokenB_quantity)
+	if approve(msg.sender, tokenA_quantity)==true:
+		self.tokenA.transferFrom(msg.sender, self, tokenA_quantity)
+	if approve(msg.sender, tokenB_quantity)==true:
+		self.tokenB.transferFrom(msg.sender, self, tokenB_quantity)
 	self.owner = msg.sender
 	self.tokenAQty = tokenA_quantity
 	self.tokenAQty = tokenB_quantity
