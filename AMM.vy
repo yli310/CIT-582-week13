@@ -37,13 +37,13 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 	assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
 	#Your code here
 	if sell_token == self.tokenA.address: 
-	self.tokenA.transferFrom(msg.sender, self, sell_quantity)
-	new_total_tokenA: uint256 = self.tokenAQty + sell_quantity
-	new_total_tokenB: uint256 = self.invariant / new_total_tokenA
-	tokenB_to_send: uint256 = self.totalBQty - new_total_tokenB
-	send(msg.sender, tokenB_to_send)
-	self.tokenBQty = new_total_tokenB
-	self.tokenAQty = new_total_tokenA
+		self.tokenA.transferFrom(msg.sender, self, sell_quantity)
+		new_total_tokenA: uint256 = self.tokenAQty + sell_quantity
+		new_total_tokenB: uint256 = self.invariant / new_total_tokenA
+		tokenB_to_send: uint256 = self.totalBQty - new_total_tokenB
+		send(msg.sender, tokenB_to_send)
+		self.tokenBQty = new_total_tokenB
+		self.tokenAQty = new_total_tokenA
 	else:
 		self.tokenB.transferFrom(msg.sender, self, sell_quantity)
 		new_total_tokenB: uint256 = self.tokenBQty + sell_quantity
