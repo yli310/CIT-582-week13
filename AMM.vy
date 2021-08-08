@@ -30,8 +30,7 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
   self.tokenAQty = tokenB_quantity
 
   self.invariant = tokenA_quantity * tokenB_quantity
-    
-	assert self.invariant > 0
+  assert self.invariant > 0
 
 # Trades one token for the other
 @external
