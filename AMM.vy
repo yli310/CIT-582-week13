@@ -48,7 +48,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 		self.tokenB.transferFrom(msg.sender, self, sell_quantity)
 		new_total_tokenB: uint256 = self.tokenBQty + sell_quantity
 		new_total_tokenA: uint256 = self.invariant / new_total_tokenB
-		tokenA_to_send: uint256 = self.totalAQty - new_total_tokenA
+		tokenA_to_send: uint256 = self.tokenAQty - new_total_tokenA
 		send(msg.sender, tokenA_to_send)
 		self.tokenAQty = new_total_tokenA
 		self.tokenBQty = new_total_tokenB
@@ -61,6 +61,6 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 def ownerWithdraw():
     assert self.owner == msg.sender
     #Your code here
-    self.token_addressA.transfer(self.owner, self.TokenAQty)
-    self.token_addressB.transfer(self.owner, self.TokenBQty)
+    self.tokenA.transfer(self.owner, self.TokenAQty)
+    self.tokenB.transfer(self.owner, self.TokenBQty)
     selfdestruct(self.owner)
