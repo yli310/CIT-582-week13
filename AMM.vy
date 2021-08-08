@@ -23,10 +23,10 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
 	#Your code here
 	self.tokenA = ERC20(tokenA_addr)
 	self.tokenB = ERC20(tokenB_addr)
-	if self.tokenA.approve(msg.sender, tokenA_quantity)==True:
-		self.tokenA.transferFrom(msg.sender, self, tokenA_quantity)
-	if self.tokenB.approve(msg.sender, tokenB_quantity)==True:
-		self.tokenB.transferFrom(msg.sender, self, tokenB_quantity)
+	assert self.tokenA.approve(msg.sender, tokenA_quantity)==True
+	self.tokenA.transferFrom(msg.sender, self, tokenA_quantity)
+	assert self.tokenB.approve(msg.sender, tokenB_quantity)==True
+	self.tokenB.transferFrom(msg.sender, self, tokenB_quantity)
 	self.owner = msg.sender
 	self.tokenAQty = tokenA_quantity
 	self.tokenAQty = tokenB_quantity
@@ -39,6 +39,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 	assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
 	#Your code here
 	if sell_token == self.tokenA.address: 
+    		assert self.tokenA.approve(msg.sender, sell_quantity)==True
 		self.tokenA.transferFrom(msg.sender, self, sell_quantity)
 		new_total_tokenA: uint256 = self.tokenAQty + sell_quantity
 		new_total_tokenB: uint256 = self.invariant / new_total_tokenA
@@ -47,6 +48,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 		self.tokenBQty = new_total_tokenB
 		self.tokenAQty = new_total_tokenA
 	else:
+    		assert self.tokenB.approve(msg.sender, sell_quantity)==True
 		self.tokenB.transferFrom(msg.sender, self, sell_quantity)
 		new_total_tokenB: uint256 = self.tokenBQty + sell_quantity
 		new_total_tokenA: uint256 = self.invariant / new_total_tokenB
