@@ -43,7 +43,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 		new_total_tokenA: uint256 = self.tokenAQty + sell_quantity
 		new_total_tokenB: uint256 = self.invariant / new_total_tokenA
 		tokenB_to_send: uint256 = self.tokenBQty - new_total_tokenB
-		#send(msg.sender, tokenB_to_send)
+		self.tokenB.transfer(msg.sender, tokenB_to_send)
 		self.tokenBQty = new_total_tokenB
 		self.tokenAQty = new_total_tokenA
 	else:
@@ -51,7 +51,7 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 		new_total_tokenB: uint256 = self.tokenBQty + sell_quantity
 		new_total_tokenA: uint256 = self.invariant / new_total_tokenB
 		tokenA_to_send: uint256 = self.tokenAQty - new_total_tokenA
-		#send(msg.sender, tokenA_to_send)
+		self.tokenA.transfer(msg.sender, tokenA_to_send)
 		self.tokenAQty = new_total_tokenA
 		self.tokenBQty = new_total_tokenB
     
