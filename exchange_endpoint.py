@@ -57,35 +57,35 @@ def process_order(order):
     receive_pk = order.receiver_pk
     exchange_rate = buy_am/sell_am
     
-    existing_orders = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).all()
-    if existing_orders == None:
+    existing = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).all()
+    if existing == None:
       return
     #filled
-    for existing in existing_orders:
-      order.filled = datetime.now()
-      existing.filled = datetime.now()
-      g.session.commit()
-      #counterparty id
-      order.counterparty_id = existing.id
-      existing.counterparty_id = order.id
-      g.session.commit()
 
-      #order can buy more
-      if(existing.sell_amount <= buy_am):
-        new_buy = buy_am - existing.sell_amount
-        new_sell = new_buy / exchange_rate
-        #Insert the order
-        order_obj = Order( sender_pk=order.sender_pk,receiver_pk=order.receiver_pk, buy_currency=order.buy_currency, sell_currency=order.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = order.id)
-        g.session.add(order_obj)
-        g.session.commit()
-      elif(existing.sell_amount>buy_am):
-        new_sell = existing.sell_amount - buy_am
-        new_buy = new_sell * existing.buy_amount/existing.sell_amount
-        #Insert the order
-        order_obj = Order( sender_pk=existing.sender_pk,receiver_pk=existing.receiver_pk, buy_currency=existing.buy_currency, sell_currency=existing.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = existing.id)
-        g.session.add(order_obj)
-        g.session.commit()
-      break;
+    order.filled = datetime.now()
+    existing.filled = datetime.now()
+    g.session.commit()
+    #counterparty id
+    order.counterparty_id = existing.id
+    existing.counterparty_id = order.id
+    g.session.commit()
+
+    #order can buy more
+    if(existing.sell_amount <= buy_am):
+      new_buy = buy_am - existing.sell_amount
+      new_sell = new_buy / exchange_rate
+      #Insert the order
+      order_obj = Order( sender_pk=order.sender_pk,receiver_pk=order.receiver_pk, buy_currency=order.buy_currency, sell_currency=order.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = order.id)
+      g.session.add(order_obj)
+      g.session.commit()
+    elif(existing.sell_amount>buy_am):
+      new_sell = existing.sell_amount - buy_am
+      new_buy = new_sell * existing.buy_amount/existing.sell_amount
+      #Insert the order
+      order_obj = Order( sender_pk=existing.sender_pk,receiver_pk=existing.receiver_pk, buy_currency=existing.buy_currency, sell_currency=existing.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = existing.id)
+      g.session.add(order_obj)
+      g.session.commit()
+    break;
     return
 
 
