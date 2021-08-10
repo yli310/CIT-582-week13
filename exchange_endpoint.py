@@ -67,8 +67,10 @@ def process_order(order):
       order.filled = curr_time
       existing.filled = curr_time
       #counterparty id
-      order.counterparty_id = existing.id
+      g.session.commit()
       existing.counterparty_id = order.id
+      order.counterparty_id = existing.id
+      
 
 
       #order can buy more
