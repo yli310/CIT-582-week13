@@ -63,13 +63,13 @@ def process_order(order):
       return
     #filled
     for existing in existing_orders:
-      order.filled = datetime.now()
-      existing.filled = datetime.now()
-      g.session.commit()
+      curr_time = datetime.now()
+      order.filled = curr_time
+      existing.filled = curr_time
       #counterparty id
       order.counterparty_id = existing.id
       existing.counterparty_id = order.id
-      g.session.commit()
+
 
       #order can buy more
       if(existing.sell_amount <= buy_am):
