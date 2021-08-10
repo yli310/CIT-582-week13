@@ -42,7 +42,7 @@ def log_message(d):
     # Hint: use json.dumps or str() to get it in a nice string form
     msg_dict = d['payload']
     log_obj = Log(message = json.dumps(msg_dict))
-"""
+
 def process_order(order):
     #Your code here
     #order = Order( sender_pk=order_dict['sender_pk'],receiver_pk=order_dict['receiver_pk'], buy_currency=order_dict['buy_currency'], sell_currency=order_dict['sell_currency'], buy_amount=order_dict['buy_amount'], sell_amount=order_dict['sell_amount'] )
@@ -90,7 +90,7 @@ def process_order(order):
       g.session.commit()
     
     return
-"""
+
 
       
 
@@ -156,6 +156,7 @@ def trade():
           
         order = Order( sender_pk=msg_dict['sender_pk'],receiver_pk=msg_dict['receiver_pk'], buy_currency=msg_dict['buy_currency'], sell_currency=msg_dict['sell_currency'], buy_amount=msg_dict['buy_amount'], sell_amount=msg_dict['sell_amount'], signature = content['sig'] )
         process_order(order)  
+        g.session.commit();
         if verify == True:
           
           #g.session.add(order)
