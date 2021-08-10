@@ -60,11 +60,11 @@ def process_order(order):
 
     
     existing = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).first()
-
+    order.filled = datetime.now()
     #filled
     if existing!=None:
       existing.filled = datetime.now()
-      order.filled = datetime.now()
+      
       #counterparty id
       order.counterparty_id = existing.id
       existing.counterparty_id = order.id
