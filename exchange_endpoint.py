@@ -77,7 +77,7 @@ def process_order(order):
       #Insert the order
       order_obj = Order( sender_pk=order.sender_pk,receiver_pk=order.receiver_pk, buy_currency=order.buy_currency, sell_currency=order.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = order.id)
       g.session.add(order_obj)
-      g.sessio.commit()
+      g.session.commit()
 
 
     elif(existing.sell_amount>buy_am):
