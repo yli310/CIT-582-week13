@@ -124,49 +124,32 @@ def trade():
             
         #Your code here
         #Note that you can access the database session using g.session
-        platform = content['payload']['platform']
-        msg_dict = content['payload']
-        message = json.dumps(msg_dict)
-        pk = content['payload']['sender_pk']
-        sig = content["sig"]
-        verify = False
-        
-        if platform == "Ethereum":
-          eth_encoded_msg = eth_account.messages.encode_defunct(text=message)
-
-          pk2 = eth_account.Account.recover_message(eth_encoded_msg,signature=sig)
-
-          if pk == pk2:
-            print( "Eth sig verifies!" )
-            verify = True
-
-          else:
-            print( "Eth sig fails verification!" )
-            verify = False
-
-
-        elif platform == "Algorand":
-
-          if algosdk.util.verify_bytes(message.encode('utf-8'),sig,pk):
-            print( "Algo sig verifies!" )
-            verify = True
-          else:
-            print( "Algo sig verification failed!" )
-            verify = False
-          
-        order = Order( sender_pk=msg_dict['sender_pk'],receiver_pk=msg_dict['receiver_pk'], buy_currency=msg_dict['buy_currency'], sell_currency=msg_dict['sell_currency'], buy_amount=msg_dict['buy_amount'], sell_amount=msg_dict['sell_amount'], signature = content['sig'] )
-        process_order(order)  
-        g.session.commit();
-        if verify == True:
-          
-          #g.session.add(order)
-          g.session.commit();
-          
-          return jsonify(True)
-          
+        payload = content['payload']
+        signature_verify = False
+        if payload['platform'] == 'Ethereum':
+            msg = eth_account.messages.encode_defunct(text=json.dumps(payload))
+            if eth_account.Account.recover_message(msg, signature=content['sig']) == payload['sender_pk']:
+                order = Order(sender_pk=payload['sender_pk'], receiver_pk=payload['receiver_pk'],
+                              buy_currency=payload['buy_currency'], sell_currency=payload['sell_currency'],
+                              buy_amount=payload['buy_amount'], sell_amount=payload['sell_amount'],
+                              signature=content['sig'])
+                signature_verify = True
+                process_order(order)
+        elif payload['platform'] == 'Algorand':
+            if algosdk.util.verify_bytes(json.dumps(payload).encode('utf-8'), content['sig'], payload['sender_pk']):
+                order = Order(sender_pk=payload['sender_pk'], receiver_pk=payload['receiver_pk'],
+                              buy_currency=payload['buy_currency'], sell_currency=payload['sell_currency'],
+                              buy_amount=payload['buy_amount'], sell_amount=payload['sell_amount'],
+                              signature=content['sig'])
+                signature_verify = True
+                process_order(order)
+        if signature_verify:
+            g.session.commit()
+            
         else:
-          log_message(content)
-          return jsonify(False)
+            log_message(content)
+
+    return jsonify(signature_verify)
         # TODO: Check the signature
         
         # TODO: Add the order to the database
@@ -180,18 +163,14 @@ def trade():
 def order_book():
     #Your code here
     #Note that you can access the database session using g.session
-    lst = []
-    for o in g.session.query(Order).all():
-        dct= {
-            'sender_pk': o.sender_pk,
-            'receiver_pk': o.receiver_pk,
-            'buy_currency': o.buy_currency,
-            'sell_currency': o.sell_currency,
-            'buy_amount': o.buy_amount,
-            'sell_amount': o.sell_amount,
-            'signature': o.signature}
-        lst.append(dct)
-    return jsonify(data=lst)
+    existing = g.session.query(Order).all()
+    result = {"data": []}
+
+    for row in existing:
+        # timestamp_str = str(row.timestamp)
+        result['data'].append({'sender_pk': row.sender_pk,'receiver_pk': row.receiver_pk, 'buy_currency': row.buy_currency, 'sell_currency': row.sell_currency, 'buy_amount': row.buy_amount, 'sell_amount': row.sell_amount,'signature': row.signature})
+
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(port='5002')
