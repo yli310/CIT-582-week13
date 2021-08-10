@@ -59,7 +59,7 @@ def process_order(order):
     exchange_rate = buy_am/sell_am
 
     
-    existing = session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).first()
+    existing = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).first()
 
     #filled
     existing.filled = datetime.now()
