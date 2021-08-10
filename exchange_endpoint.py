@@ -70,7 +70,7 @@ def process_order(order):
       g.session.commit()
 
       #order can buy more
-      if(existing.sell_amount < buy_am):
+      if(existing.sell_amount <= buy_am):
         new_buy = buy_am - existing.sell_amount
         new_sell = new_buy / exchange_rate
         #Insert the order
@@ -83,8 +83,6 @@ def process_order(order):
         #Insert the order
         order_obj = Order( sender_pk=existing.sender_pk,receiver_pk=existing.receiver_pk, buy_currency=existing.buy_currency, sell_currency=existing.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = existing.id)
         g.session.add(order_obj)
-        g.session.commit()
-      else:
         g.session.commit()
       break;
 
