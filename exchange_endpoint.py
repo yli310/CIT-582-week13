@@ -64,7 +64,7 @@ def process_order(order):
     #filled
     
     existing.filled = datetime.now()
-
+    g.session.commit()
     #counterparty id
     order.counterparty_id = existing.id
     existing.counterparty_id = order.id
