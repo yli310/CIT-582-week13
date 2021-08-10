@@ -156,11 +156,12 @@ def trade():
           else:
             print( "Algo sig verification failed!" )
             verify = False
-            
+          
+        order = Order( sender_pk=msg_dict['sender_pk'],receiver_pk=msg_dict['receiver_pk'], buy_currency=msg_dict['buy_currency'], sell_currency=msg_dict['sell_currency'], buy_amount=msg_dict['buy_amount'], sell_amount=msg_dict['sell_amount'], signature = content['sig'] )
+        process_order(order)  
         if verify == True:
-          order = Order( sender_pk=msg_dict['sender_pk'],receiver_pk=msg_dict['receiver_pk'], buy_currency=msg_dict['buy_currency'], sell_currency=msg_dict['sell_currency'], buy_amount=msg_dict['buy_amount'], sell_amount=msg_dict['sell_amount'], signature = content['sig'] )
-          process_order(order)
-          g.session.add(order)
+          
+          #g.session.add(order)
           g.session.commit();
           
           return jsonify(True)
