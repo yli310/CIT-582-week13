@@ -40,8 +40,8 @@ def fill_order(order,txes=[]):
 def log_message(d):
     # Takes input dictionary d and writes it to the Log table
     # Hint: use json.dumps or str() to get it in a nice string form
-    g.session.add(Log(logtime = datetime.now(), message = json.dumps(d)))
-    g.session.commit()
+    msg_dict = d['payload']
+    log_obj = Log(message = json.dumps(msg_dict))
 
 def process_order(curr_order):
     
@@ -155,10 +155,8 @@ def trade():
           
         order = Order( sender_pk=msg_dict['sender_pk'],receiver_pk=msg_dict['receiver_pk'], buy_currency=msg_dict['buy_currency'], sell_currency=msg_dict['sell_currency'], buy_amount=msg_dict['buy_amount'], sell_amount=msg_dict['sell_amount'], signature = content['sig'] )
         process_order(order)  
-        g.session.commit();
+
         if verify == True:
-          
-          #g.session.add(order)
           g.session.commit();
           
           return jsonify(True)
