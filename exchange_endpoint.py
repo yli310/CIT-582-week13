@@ -180,14 +180,18 @@ def trade():
 def order_book():
     #Your code here
     #Note that you can access the database session using g.session
-    existing = g.session.query(Order).all()
-    result = {"data": []}
-
-    for row in existing:
-        # timestamp_str = str(row.timestamp)
-        result['data'].append({'sender_pk': row.sender_pk,'receiver_pk': row.receiver_pk, 'buy_currency': row.buy_currency, 'sell_currency': row.sell_currency, 'buy_amount': row.buy_amount, 'sell_amount': row.sell_amount,'signature': row.signature})
-
-    return jsonify(result)
+    lst = []
+    for o in g.session.query(Order).all():
+        dct= {
+            'sender_pk': o.sender_pk,
+            'receiver_pk': o.receiver_pk,
+            'buy_currency': o.buy_currency,
+            'sell_currency': o.sell_currency,
+            'buy_amount': o.buy_amount,
+            'sell_amount': o.sell_amount,
+            'signature': o.signature}
+        lst.append(dct)
+    return jsonify(data=lst)
 
 if __name__ == '__main__':
     app.run(port='5002')
