@@ -55,9 +55,7 @@ def process_order(order):
     sell_am = order.sell_amount
     send_pk = order.sender_pk
     receive_pk = order.receiver_pk
-    
     exchange_rate = buy_am/sell_am
-
     
     existing_orders = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).all()
     
@@ -75,23 +73,18 @@ def process_order(order):
       if(existing.sell_amount < buy_am):
         new_buy = buy_am - existing.sell_amount
         new_sell = new_buy / exchange_rate
-
         #Insert the order
         order_obj = Order( sender_pk=order.sender_pk,receiver_pk=order.receiver_pk, buy_currency=order.buy_currency, sell_currency=order.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = order.id)
         g.session.add(order_obj)
         g.session.commit()
-
-
       elif(existing.sell_amount>buy_am):
-
         new_sell = existing.sell_amount - buy_am
         new_buy = new_sell * existing.buy_amount/existing.sell_amount
-
-
-
         #Insert the order
         order_obj = Order( sender_pk=existing.sender_pk,receiver_pk=existing.receiver_pk, buy_currency=existing.buy_currency, sell_currency=existing.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = existing.id)
         g.session.add(order_obj)
+        g.session.commit()
+      else:
         g.session.commit()
       break;
 
