@@ -58,7 +58,8 @@ def process_order(order):
     exchange_rate = buy_am/sell_am
     
     existing_orders = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).all()
-    
+    if exisiing_order == None:
+      return
     #filled
     for existing in existing_orders:
       order.filled = datetime.now()
@@ -85,6 +86,7 @@ def process_order(order):
         g.session.add(order_obj)
         g.session.commit()
       break;
+    return
 
 
       
