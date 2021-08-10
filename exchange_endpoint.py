@@ -43,52 +43,53 @@ def log_message(d):
     msg_dict = d['payload']
     log_obj = Log(message = json.dumps(msg_dict))
 
-def process_order(curr_order):
+def process_order(order):
+    #Your code here
+    #order = Order( sender_pk=order_dict['sender_pk'],receiver_pk=order_dict['receiver_pk'], buy_currency=order_dict['buy_currency'], sell_currency=order_dict['sell_currency'], buy_amount=order_dict['buy_amount'], sell_amount=order_dict['sell_amount'] )
+    g.session.add(order)
+    g.session.commit();
     
-    g.session.add(curr_order)
+    buy_curr = order.buy_currency
+    sell_curr = order.sell_currency
+    buy_am = order.buy_amount
+    sell_am = order.sell_amount
+    send_pk = order.sender_pk
+    receive_pk = order.receiver_pk
+    exchange_rate = buy_am/sell_am
+    
+    existing = g.session.query(Order).filter(Order.filled == None, Order.buy_currency == order.sell_currency,Order.sell_currency == order.buy_currency, Order.sell_amount/Order.buy_amount >= exchange_rate).first()
+    g.session.commit()
+    if existing == None:
+      return
+    #filled
+    curr_time = datetime.now()
+    order.filled = curr_time
+    existing.filled = curr_time
+    #counterparty id
+    g.session.commit()
+    existing.counterparty_id = order.id
+    order.counterparty_id = existing.id
     g.session.commit()
 
-    while curr_order is not None:
-        existing_orders = g.session.query(Order).filter(Order.filled == None).all()
-        for o in existing_orders:
-            if o.buy_currency == curr_order.sell_currency and o.sell_currency == curr_order.buy_currency and \
-                    o.sell_amount /o.buy_amount >= curr_order.buy_amount / curr_order.sell_amount:
-                curr_time = datetime.now()
-                o.filled = curr_time
-                curr_order.filled = curr_time
-                curr_order.counterparty_id = o.id
-                o.counterparty_id = curr_order.id
-                
-                if o.sell_amount < curr_order.buy_amount:
-                    remaining_balance = curr_order.buy_amount - o.sell_amount
 
-                    new_order = Order(buy_currency=curr_order.buy_currency,
-                       sell_currency=curr_order.sell_currency,
-                       buy_amount=remaining_balance,
-                       sell_amount=remaining_balance * curr_order.sell_amount / curr_order.buy_amount,
-                       sender_pk=curr_order.sender_pk,
-                       receiver_pk=curr_order.receiver_pk,
-                       creator_id=curr_order.id,
-                       filled=None)
-                    g.session.add(new_order)
-                    g.session.commit()
-                elif o.sell_amount > curr_order.buy_amount:
-                    remaining_balance = o.sell_amount - curr_order.buy_amount
-                    new_order = Order(buy_currency=o.buy_currency,
-                      sell_currency=o.sell_currency,
-                      buy_amount=remaining_balance * o.buy_amount / o.sell_amount ,
-                      sell_amount=remaining_balance,
-                      sender_pk=o.sender_pk,
-                      receiver_pk=o.receiver_pk,
-                      creator_id=o.id,
-                      filled=None)
-                    g.session.add(new_order)
-                    g.session.commit()
-                else:
-                    curr_order=None
-                    g.session.commit()
-                break
-        return
+
+    #order can buy more
+    if(existing.sell_amount <= buy_am):
+      new_buy = buy_am - existing.sell_amount
+      new_sell = new_buy / exchange_rate
+      #Insert the order
+      order_obj = Order( sender_pk=order.sender_pk,receiver_pk=order.receiver_pk, buy_currency=order.buy_currency, sell_currency=order.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = order.id)
+      g.session.add(order_obj)
+      g.session.commit()
+    elif(existing.sell_amount>buy_am):
+      new_sell = existing.sell_amount - buy_am
+      new_buy = new_sell * existing.buy_amount/existing.sell_amount
+      #Insert the order
+      order_obj = Order( sender_pk=existing.sender_pk,receiver_pk=existing.receiver_pk, buy_currency=existing.buy_currency, sell_currency=existing.sell_currency, buy_amount=new_buy, sell_amount=new_sell, creator_id = existing.id)
+      g.session.add(order_obj)
+      g.session.commit()
+    
+    return
 
 
       
